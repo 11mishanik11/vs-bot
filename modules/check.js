@@ -6,6 +6,8 @@ const times = ['02', '07', '15']
 export async function check(bot) {
     let data = await getPageHtml()
 
+
+    // Проверка отбивов
     for (let loc in data.one) {
         let thisLoc = data.one[loc]
     
@@ -27,6 +29,8 @@ export async function check(bot) {
             })
         }
     }
+
+    // Проверка локаций с монстрами
     for (let loc in data.two) {
         let thisLoc = data.two[loc]
         if(thisLoc.status == 'mobs') {
@@ -48,6 +52,7 @@ export async function check(bot) {
         }
     }
 
+    // Проверка замков
     for (let castle of data.castles) {
         if(castle.attackInfo && (castle.attackInfo.time.indexOf('04') !== -1)) {
             bot.telegram.sendMessage(process.env.CHAT_ID,
