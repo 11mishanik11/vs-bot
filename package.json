@@ -1,5 +1,5 @@
 {
-  "name": "vs-btom",
+  "name": "vs-bot",
   "version": "1.0.0",
   "description": "Бот выводит информация о локациях в браузерной РПГ Времена Смуты",
   "main": "index.js",

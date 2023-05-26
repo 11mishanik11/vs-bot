@@ -1,7 +1,7 @@
 import { getPageHtml } from "./getPageHtml.js";
 import getClanName from './getClanName.js'
 
-const times = ['02', '05', '10', '15']
+const times = ['02', '07', '15']
 
 export async function check(bot) {
     let data = await getPageHtml()
@@ -22,7 +22,7 @@ export async function check(bot) {
         } else if(thisLoc.status.includes('Прием заявок')) {
             bot.telegram.sendMessage(-1001913180942,
             `<b>${thisLoc.name}</b>\n`+
-            `Сбор заявок на атаку - <b>ЖМЯКАМИ</b>`, {
+            `Сбор заявок на атаку - <b>ЖМЯКАЕМ</b>`, {
                 parse_mode: 'HTML'
             })
         }
