@@ -1,13 +1,14 @@
-import getClansList from './getClansList.js'
+import {readFile} from 'node:fs/promises'
 
 export default async function getClanName(iconClanLink) {
 
-  let clans = await getClansList()
+  let clans = JSON.parse(await readFile('data/clanList.json', 'utf-8', (err, data) => {
+    if(err) {throw err} else return data
+  }))
 
   for (let clan of clans) {
-    let thisIcon = clan.find('.px-1.py-1.text-start').find('img').attr('src')
-    if(iconClanLink === thisIcon) {
-      return clan.find('.px-1.py-1.text-start .app-link').text()
+    if(iconClanLink === clan.icon) {
+      return await clan.name
     }
   }
 }

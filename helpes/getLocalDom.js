@@ -7,5 +7,5 @@ export default async function getLocalDom(link) {
     transform: function (body) {
         return cheerio.load(body);
     }
-  })
+  }).catch (err => {throw err})
 }
