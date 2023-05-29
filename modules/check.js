@@ -1,8 +1,8 @@
 import { getPageHtml } from './getPageHtml.js'
 import getClanName from './getClanName.js'
 
-const lastData = {}
-const times = ['02', '07', '15']
+// const lastData = {}
+// const times = ['02', '07', '15']
 
 export async function check(bot) {
   let data = await getPageHtml()
@@ -64,13 +64,14 @@ export async function check(bot) {
           {parse_mode: 'HTML'}
           )
       } else if(castle.attackInfo.attack === 'attack') {
-        bot.telegram.sendMessage(process.env.CHAT_ID,
-            `<b>${castle.name}</b>\n`+
-            `Идет штурм!`,
-          {parse_mode: 'HTML'}
-        )
+        // bot.telegram.sendMessage(process.env.CHAT_ID,
+        //     `<b>${castle.name}</b>\n`+
+        //     `Штурм начался!`,
+        //   {parse_mode: 'HTML'}
+        // )
+        console.log('Штурм начался!')
       } else if (castle.attackInfo.attack === 'noAttack') {
-        if (castle.time === '00 ч 00 мин') {
+        if (castle.attackInfo.time === '00 ч 00 мин') {
           bot.telegram.sendMessage(process.env.CHAT_ID,
             `<b>${castle.name}</b>\n`+
             `Атака закончилась в пользу: <b>${await getClanName(castle.thisClan)}</b>`,

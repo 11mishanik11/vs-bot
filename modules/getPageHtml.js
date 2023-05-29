@@ -76,7 +76,10 @@ export async function getPageHtml() {
                   attackClan: castles[i].find('.float-end > img').attr('src'),
                 }
               } else return {attack: 'attack'}
-            } else return {attack: 'noAttack'}
+            } else return {
+              attack: 'noAttack',
+              time: castles[i].find('.float-end').text().trim()
+            }
           })(),
         })
       }
