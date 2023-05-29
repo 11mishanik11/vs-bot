@@ -1,8 +1,17 @@
 import { getPageHtml } from './getPageHtml.js'
 import getClanName from './getClanName.js'
 
-// const lastData = {}
-// const times = ['02', '07', '15']
+const lastData = {
+  location: 'Локации',
+  castes: [],
+}
+const times = ['02', '07', '15']
+
+/*
+* Проверка последнего отправленного сообщения
+* Если с отправки крайнего сообщения прошло меньше 'n' времени
+* Ничего не отправляем, иначе отправляем и перезаписываем данные
+* */
 
 export async function check(bot) {
   let data = await getPageHtml()
@@ -54,30 +63,70 @@ export async function check(bot) {
 
   // Проверка замков
   for (let castle of data.castles) {
-      if(castle.attackInfo.attack === 'preAttack' && (castle.attackInfo.time.indexOf('04') !== -1)) {
-          // Если статус атаки есть
-          bot.telegram.sendMessage(process.env.CHAT_ID,
-            `<b>${castle.name}</b>\n`+
-            `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
-            `Атакующий клан: ${await getClanName(castle.attackInfo.attackClan)}\n`+
-            `⚔️До атаки <b>${castle.attackInfo.time}</b>`,
-          {parse_mode: 'HTML'}
-          )
-      } else if(castle.attackInfo.attack === 'attack') {
-        // bot.telegram.sendMessage(process.env.CHAT_ID,
-        //     `<b>${castle.name}</b>\n`+
-        //     `Штурм начался!`,
-        //   {parse_mode: 'HTML'}
-        // )
-        console.log('Штурм начался!')
-      } else if (castle.attackInfo.attack === 'noAttack') {
-        if (castle.attackInfo.time === '00 ч 00 мин') {
-          bot.telegram.sendMessage(process.env.CHAT_ID,
-            `<b>${castle.name}</b>\n`+
-            `Атака закончилась в пользу: <b>${await getClanName(castle.thisClan)}</b>`,
-          {parse_mode: 'HTML'}
-          )
-        }
+    /*
+    * Получение последних данных о замке записаных в кеш
+    * Если данных нет, создаем объект, пушим в кеш и получаем от туда
+    * */
+    let thisCastleLastData = {} // Последние данные о текущем замке
+
+    if (lastData.castes.length === data.castles.length) {
+      console.log('Данные в кеше есть, беру их от сюда')
+      thisCastleLastData = lastData.castes.find(item => item.name === castle.name)
+    } else {
+      console.log('Данные в кеше отсутствуют, собираю массив')
+      let thisCastle = {
+        name: castle.name,
+        timeMessageAttack: null,
+        thisClan: {
+          name: castle.thisClan,
+          timeAfterAttack: (function () {
+            if (castle.attackInfo.attack === 'noAttack') {
+              return castle.attackInfo.time
+            }
+          })(),
+        },
+        nameAttackClan: (function () {
+          if (castle.attackInfo.attack === 'attack') {
+            return castle.attackInfo.attackClan
+          }
+        })(),
       }
+      lastData.castes.push(thisCastle)
+      thisCastleLastData = thisCastle
+    }
+
+    if(castle.attackInfo.attack === 'preAttack' && (castle.attackInfo.time.indexOf('04') !== -1)) {
+      bot.telegram.sendMessage(process.env.CHAT_ID,
+        `<b>${castle.name}</b>\n`+
+        `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
+        `Атакующий клан: ${await getClanName(castle.attackInfo.attackClan)}\n`+
+        `⚔️До атаки <b>${castle.attackInfo.time}</b>`,
+      {parse_mode: 'HTML'}
+      )
+    } else if(castle.attackInfo.attack === 'attack') {
+      function sendMessage() {
+        thisCastleLastData.timeMessageAttack = new Date()
+        console.log('Штурм начался')
+        bot.telegram.sendMessage(process.env.CHAT_ID,
+          `<b>${castle.name}</b>\n`+
+          `Штурм начался!`,
+          {parse_mode: 'HTML'}
+        )
+      }
+
+      if (thisCastleLastData.timeMessageAttack) {
+        if (new Date() - thisCastleLastData.timeMessageAttack > 900000) {
+          sendMessage()
+        } else console.log('Штурм все еще идет, о крайнее сообщение о штурме было меньше 15 минут назад')
+      } else sendMessage()
+    } else if (castle.attackInfo.attack === 'noAttack') {
+      if (castle.attackInfo.time === '00 ч 00 мин') {
+        bot.telegram.sendMessage(process.env.CHAT_ID,
+          `<b>${castle.name}</b>\n`+
+          `Атака закончилась в пользу: <b>${await getClanName(castle.thisClan)}</b>`,
+        {parse_mode: 'HTML'}
+        )
+      }
+    }
   }
 }

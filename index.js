@@ -7,11 +7,11 @@ dotenv.config()
 export const bot = new Telegraf(process.env.SECRET_CODE)
 
 // Инициализация уведомлений
-function init() {
+async function init() {
   try {
     // Обновление списка кланов раз в 30 минут
-    getClansList()
-    setInterval(() => getClansList(), 1800000)
+    // await getClansList()
+    // setInterval(() => getClansList(), 1800000)
 
     // Проверка
     check(bot)
