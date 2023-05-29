@@ -54,33 +54,29 @@ export async function check(bot) {
 
   // Проверка замков
   for (let castle of data.castles) {
-      if(castle.attackInfo.attack === 'preAttack' && (castle.attackInfo.time.indexOf('04') !== -1)) { 
+      if(castle.attackInfo.attack === 'preAttack' && (castle.attackInfo.time.indexOf('04') !== -1)) {
           // Если статус атаки есть
           bot.telegram.sendMessage(process.env.CHAT_ID,
-              `<b>${castle.name}</b>\n`+
-              `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
-              `Атакующий клан: ${await getClanName(castle.attackInfo.attackClan)}\n`+
-              `⚔️До атаки <b>${castle.attackInfo.time}</b>`, {
-                parse_mode: 'HTML'
-              }
+            `<b>${castle.name}</b>\n`+
+            `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
+            `Атакующий клан: ${await getClanName(castle.attackInfo.attackClan)}\n`+
+            `⚔️До атаки <b>${castle.attackInfo.time}</b>`,
+          {parse_mode: 'HTML'}
           )
       } else if(castle.attackInfo.attack === 'attack') {
         bot.telegram.sendMessage(process.env.CHAT_ID,
-          `<b>${castle.name}</b>\n`+
-          `Идет штурм!`, {
-            parse_mode: 'HTML'
-          }
+            `<b>${castle.name}</b>\n`+
+            `Идет штурм!`,
+          {parse_mode: 'HTML'}
         )
-      } else if (castle.attackInfo.attack === 'noAttack' && castle.attackInfo.time.match(/00 ч 00 мин/)) {
-        /*Когда атаки нет, проверяем время. Если оно равно 00 ч 00 мин, значит атака только закончилась
-        Отправляем сообщение, об успешном захвате, иначе прежних владельцев */
-        bot.telegram.sendMessage(process.env.CHAT_ID,
-          `<b>${castle.name}</b>\n`+
-          `Атака закончилась в пользу ${await getClanName(castle.thisClan)}`, {
-            parse_mode: 'HTML'
-          }
-        )
-        console.log('Атака закончилась в пользу: ' + await getClanName(castle.thisClan))
+      } else if (castle.attackInfo.attack === 'noAttack') {
+        if (castle.time === '00 ч 00 мин') {
+          bot.telegram.sendMessage(process.env.CHAT_ID,
+            `<b>${castle.name}</b>\n`+
+            `Атака закончилась в пользу: <b>${await getClanName(castle.thisClan)}</b>`,
+          {parse_mode: 'HTML'}
+          )
+        }
       }
   }
 }

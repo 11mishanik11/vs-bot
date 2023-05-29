@@ -68,22 +68,15 @@ export async function getPageHtml() {
             // 1 Есть планируется атака, собираем время и ссылку на лого клана
             // 2 Идет штурм
             // 3 Штурм окончен
-            if(castles[i].find('.float-end > span').text()) {
-              return {
-                attack: 'preAttack',
-                time: castles[i].find('.float-end > span').text().trim(),
-                attackClan: castles[i].find('.float-end > img').attr('src'),
-              }
-            } else if(castles[i].find('.float-end').text().indexOf('штурм') !== -1) {
-              // Начало штурма
-              return {
-                attack: 'attack',
-              }
-            } else return {
-              // Иначе время прошедшее с последней атаки
-              attack: 'noAttack',
-              time: castles[i].find('.float-end').text().trim()
-            }
+            if (castles[i].find('.float-end > span').text()) {
+              if (castles[i].find('.float-end > span').text() !== 'Идет штурм') {
+                return {
+                  attack: 'preAttack',
+                  time: castles[i].find('.float-end > span').text().trim(),
+                  attackClan: castles[i].find('.float-end > img').attr('src'),
+                }
+              } else return {attack: 'attack'}
+            } else return {attack: 'noAttack'}
           })(),
         })
       }
