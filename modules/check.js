@@ -127,7 +127,7 @@ export async function check(bot) {
         } else console.log('Штурм все еще идет, о крайнее сообщение о штурме было меньше 15 минут назад')
       } else sendMessage()
     } else if (castle.attackInfo.attack === 'noAttack') {
-      if (true) {
+      if (castle.attackInfo.time === '00 ч 00 мин') {
         bot.telegram.sendMessage(process.env.CHAT_ID,
           `${thisCastleLastData.smiley.smiley}<b>${castle.name}</b>${thisCastleLastData.smiley.smiley}\n`+
           `Атака закончилась в пользу: <b>${await getClanName(castle.thisClan)}</b>`,
