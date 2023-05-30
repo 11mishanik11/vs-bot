@@ -1,0 +1,45 @@
+{
+  "locations": "",
+  "castles": [
+    {
+      "name": "Замок Страха",
+      "smiley": "😱",
+      "timeMessageAttack": null,
+      "thisClan": {
+        "name": null,
+        "timeAfterAttack": null
+      },
+      "nameAttackClan": null
+    },
+    {
+      "name": "Замок с Привидениями",
+      "smiley": "👻",
+      "timeMessageAttack": null,
+      "thisClan": {
+        "name": null,
+        "timeAfterAttack": null
+      },
+      "nameAttackClan": null
+    },
+    {
+      "name": "Замок Стали",
+      "smiley": "🛡",
+      "timeMessageAttack": null,
+      "thisClan": {
+        "name": null,
+        "timeAfterAttack": null
+      },
+      "nameAttackClan": null
+    },
+    {
+      "name": "Замок Белого Камня",
+      "smiley": "💎",
+      "timeMessageAttack": null,
+      "thisClan": {
+        "name": null,
+        "timeAfterAttack": null
+      },
+      "nameAttackClan": null
+    }
+  ]
+}

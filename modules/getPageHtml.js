@@ -64,10 +64,6 @@ export async function getPageHtml() {
           name: castles[i].find('.d-inline.d-md-none.d-xl-inline').text().trim(),
           thisClan: castles[i].find('> img').attr('src'),
           attackInfo: (function () {
-
-            // 1 Есть планируется атака, собираем время и ссылку на лого клана
-            // 2 Идет штурм
-            // 3 Штурм окончен
             if (castles[i].find('.float-end > span').text()) {
               if (castles[i].find('.float-end > span').text() !== 'Идет штурм') {
                 return {
