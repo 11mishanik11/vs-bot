@@ -5,6 +5,12 @@ const lastData = {
   location: 'Локации',
   castes: [],
 }
+const smileyCastles = [
+  {name: 'Замок Страха', smiley: '😱'},
+  {name: 'Замок с Привидениями', smiley: '👻'},
+  {name: 'Замок Стали', smiley: '🛡'},
+  {name: 'Замок Белого Камня', smiley: '💎'},
+]
 const times = ['02', '07', '15']
 
 /*
@@ -76,6 +82,7 @@ export async function check(bot) {
       console.log('Данные в кеше отсутствуют, собираю массив')
       let thisCastle = {
         name: castle.name,
+        smiley: smileyCastles.find(item => item.name === castle.name),
         timeMessageAttack: null,
         thisClan: {
           name: castle.thisClan,
@@ -97,7 +104,7 @@ export async function check(bot) {
 
     if(castle.attackInfo.attack === 'preAttack' && (castle.attackInfo.time.indexOf('04') !== -1)) {
       bot.telegram.sendMessage(process.env.CHAT_ID,
-        `<b>${castle.name}</b>\n`+
+        `${thisCastleLastData.smiley.smiley}<b>${castle.name}</b>${thisCastleLastData.smiley.smiley}\n`+
         `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
         `Атакующий клан: ${await getClanName(castle.attackInfo.attackClan)}\n`+
         `⚔️До атаки <b>${castle.attackInfo.time}</b>`,
@@ -108,7 +115,7 @@ export async function check(bot) {
         thisCastleLastData.timeMessageAttack = new Date()
         console.log('Штурм начался')
         bot.telegram.sendMessage(process.env.CHAT_ID,
-          `<b>${castle.name}</b>\n`+
+          `${thisCastleLastData.smiley.smiley}<b>${castle.name}</b>${thisCastleLastData.smiley.smiley}\n`+
           `Штурм начался!`,
           {parse_mode: 'HTML'}
         )
@@ -120,9 +127,9 @@ export async function check(bot) {
         } else console.log('Штурм все еще идет, о крайнее сообщение о штурме было меньше 15 минут назад')
       } else sendMessage()
     } else if (castle.attackInfo.attack === 'noAttack') {
-      if (castle.attackInfo.time === '00 ч 00 мин') {
+      if (true) {
         bot.telegram.sendMessage(process.env.CHAT_ID,
-          `<b>${castle.name}</b>\n`+
+          `${thisCastleLastData.smiley.smiley}<b>${castle.name}</b>${thisCastleLastData.smiley.smiley}\n`+
           `Атака закончилась в пользу: <b>${await getClanName(castle.thisClan)}</b>`,
         {parse_mode: 'HTML'}
         )
