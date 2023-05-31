@@ -140,13 +140,14 @@ export async function check(bot) {
             if (castleState.thisClan.timeAfterAttack && castleState.attackInfo.startTime) {
               let difference = new Date() - castleState.attackInfo.startTime
               let lastTime = timeMs(castleState.thisClan.timeAfterAttack)
+              let lastTimeDif = lastTime + difference
               let newTime = timeMs(castle.attackInfo.time)
 
               console.log('Разница ' + difference)
+              console.log('Старое время + разница = ' + lastTimeDif);
               console.log(lastTime + '< Старое & Новое >' + newTime)
-              console.log(lastTime === newTime)
 
-              if ((lastTime + difference) >= (newTime + 60000) || (lastTime + difference) <= (newTime - 60000)) {
+              if (lastTimeDif >= (newTime - 60000) || lastTimeDif <= (newTime + 60000)) {
                 console.log(`Атака закончилась не удачно, ${castleState.thisClan.name} отбили атаку`)
               }
 
