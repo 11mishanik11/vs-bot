@@ -36,7 +36,7 @@ async function thisCastle (castle) {
     }
     storeData.castles.push(item)
     return item
-  } else return storeData.castles.find(item => item.name === castle.name) // Последние данные о текущем замке
+  } else return storeData.castles.find(item => item.name === castle.name) // Последние данные о текущем замке из кеша
 }
 
 export async function check(bot) {
@@ -98,7 +98,7 @@ export async function check(bot) {
 
           if (castle.attackInfo.time.indexOf('04') !== -1) {
             castleState.attackInfo.startTime = new Date()
-            castleState.attackInfo.name = await getClanName(castle.attackInfo.name)
+            castleState.attackInfo.name = await getClanName(castle.attackInfo.attackClan)
             bot.telegram.sendMessage(process.env.CHAT_ID,
               `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}\n`+
               `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
@@ -129,15 +129,14 @@ export async function check(bot) {
           if (castle.attackInfo.time === '00 ч 00 мин') {
             console.log('Замок захватили')
 
-            castleState.thisClan.name = await getClanName(castle.thisClan)
-            castleState.timeMessageAttack = null
-            castleState.attackInfo.startTime = null
-
             bot.telegram.sendMessage(process.env.CHAT_ID,
               `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}\n`+
               `<b>${await getClanName(castle.thisClan)}</b> успешно захватили замок!`,
               {parse_mode: 'HTML'}
             )
+            castleState.thisClan.name = await getClanName(castle.thisClan)
+            castleState.timeMessageAttack = null
+            castleState.attackInfo.startTime = null
           } else {
             if (castleState.thisClan.timeAfterAttack && castleState.attackInfo.startTime) {
               let difference = new Date() - castleState.attackInfo.startTime
@@ -146,20 +145,20 @@ export async function check(bot) {
               let newTime = timeMs(castle.attackInfo.time)
 
               console.log('Разница ' + difference)
-              console.log('Старое время + разница = ' + lastTimeDif);
+              console.log('Старое время + разница = ' + lastTimeDif)
               console.log(lastTime + '< Старое & Новое >' + newTime)
 
               if (lastTimeDif >= (newTime - 60000) || lastTimeDif <= (newTime + 60000)) {
-                castleState.attackInfo.startTime = null
-                castleState.thisClan.timeAfterAttack = castle.attackInfo.time
-
                 bot.telegram.sendMessage(process.env.CHAT_ID,
                   `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}\n`+
-                  `<b>${await getClanName(castle.thisClan)}</b> отбили замок и вышвырнули ${castleState.attackInfo.name} за ворота!`,
+                  `<b>${await getClanName(castle.thisClan)}</b> отбили штурм ${castleState.attackInfo.name}`,
                   {parse_mode: 'HTML'}
                 )
                 castleState.timeMessageAttack = null
                 castleState.attackInfo.startTime = null
+                castleState.attackInfo.name = null
+                castleState.attackInfo.startTime = null
+                castleState.thisClan.timeAfterAttack = castle.attackInfo.time
               }
             } else {
               castleState.thisClan.timeAfterAttack = castle.attackInfo.time
