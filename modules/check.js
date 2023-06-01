@@ -7,7 +7,7 @@ const smileyCastles = [
   {name: 'Замок Стали', smiley: '🛡'},
   {name: 'Замок Белого Камня', smiley: '💎'},
 ]
-const storeData = {
+const stateData = {
   castles: [],
 }
 const times = ['02', '07', '15']
@@ -20,7 +20,7 @@ let timeMs = (str) => {
 }
 
 async function thisCastle (castle) {
-  if (storeData.castles.length < 4) {
+  if (stateData.castles.length < 4) {
     let item = {
       name: castle.name,
       smiley: smileyCastles.find(item => item.name === castle.name),
@@ -34,9 +34,9 @@ async function thisCastle (castle) {
         startTime: null,
       }
     }
-    storeData.castles.push(item)
+    stateData.castles.push(item)
     return item
-  } else return storeData.castles.find(item => item.name === castle.name) // Последние данные о текущем замке из кеша
+  } else return stateData.castles.find(item => item.name === castle.name) // Последние данные о текущем замке из кеша
 }
 
 export async function check(bot) {
@@ -91,6 +91,7 @@ export async function check(bot) {
     console.log('************* Логи с проверки *****************')
     for (let castle of data.castles) {
       let castleState = await thisCastle(castle)
+      let castleNameSmiley = `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}`
 
       switch (castle.attackInfo.attack) {
         case "preAttack":
@@ -100,7 +101,7 @@ export async function check(bot) {
             castleState.attackInfo.startTime = new Date()
             castleState.attackInfo.name = await getClanName(castle.attackInfo.attackClan)
             bot.telegram.sendMessage(process.env.CHAT_ID,
-              `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}\n`+
+              `${castleNameSmiley}\n`+
               `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
               `Атакующий клан: ${await getClanName(castle.attackInfo.attackClan)}\n`+
               `⚔️До атаки <b>${castle.attackInfo.time}</b>`,
@@ -113,7 +114,7 @@ export async function check(bot) {
             console.log('Штурм начался, отправляю сообщение')
             castleState.timeMessageAttack = new Date()
             bot.telegram.sendMessage(process.env.CHAT_ID,
-              `<b>${castle.name}</b>\n`+
+              `${castleNameSmiley}\n`+
               `Штурм начался!`,
               {parse_mode: 'HTML'}
             )
@@ -130,7 +131,7 @@ export async function check(bot) {
             console.log('Замок захватили')
 
             bot.telegram.sendMessage(process.env.CHAT_ID,
-              `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}\n`+
+              `${castleNameSmiley}\n`+
               `<b>${await getClanName(castle.thisClan)}</b> успешно захватили замок!`,
               {parse_mode: 'HTML'}
             )
@@ -150,7 +151,7 @@ export async function check(bot) {
 
               if (lastTimeDif >= (newTime - 60000) || lastTimeDif <= (newTime + 60000)) {
                 bot.telegram.sendMessage(process.env.CHAT_ID,
-                  `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}\n`+
+                  `${castleNameSmiley}\n`+
                   `<b>${await getClanName(castle.thisClan)}</b> отбили штурм ${castleState.attackInfo.name}`,
                   {parse_mode: 'HTML'}
                 )
