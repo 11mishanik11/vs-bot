@@ -11,10 +11,10 @@ async function init() {
   try {
     // Обновление списка кланов раз в 30 минут
     await getClansList()
-    // setInterval(() => getClansList(), 1800000)
+    setInterval(() => getClansList(), 1800000)
 
     // Проверка
-    check(bot)
+    await check(bot)
     setInterval(() => check(bot), 60000);
   } catch (e) {
     console.error(e);

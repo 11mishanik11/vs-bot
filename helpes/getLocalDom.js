@@ -1,11 +1,8 @@
-import request from "request-promise";
-import cheerio from "cheerio";
+import axios from "axios";
+import CheerioAPI from "cheerio";
 
-export default async function getLocalDom(link) {
-  return await request({
-    uri: link,
-    transform: function (body) {
-        return cheerio.load(body);
-    }
-  }).catch (err => {throw err})
+async function getLocalDom(link) {
+  return await axios.get(link).then(({data}) => CheerioAPI.load(data))
 }
+
+export default getLocalDom

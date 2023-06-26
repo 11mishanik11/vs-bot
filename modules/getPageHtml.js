@@ -3,17 +3,18 @@ import getLocalDom from '../helpes/getLocalDom.js'
 export async function getPageHtml() {
   try {
     let $ = await getLocalDom('https://vsmuta.com/info/locs')
-
     let locations = []
 
     // Собираем массив локаций
-    $('.col-12.col-md-6.text-center.mt-2').each(function () {
+    $('.col-12.col-md-6.text-center.mt-2')
+    .each(function () {
       locations.push($(this))
     })
 
     // Собираем замки в массив
     let castles = []
-    $('.row.site-block-info.mx-0 .col-12.px-0').each(function () {
+    $('.row.site-block-info.mx-0').has('.col-12.px-0').first().find('.col-12.px-0')
+    .each(function() {
       castles.push($(this))
     })
 
