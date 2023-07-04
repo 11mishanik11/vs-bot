@@ -28,7 +28,7 @@ class ConstMessage {
 	async notSuccessAttack (castle, nameString) {
 		return (
 			`${nameString}\n`+
-			`<b>${await getClanName(castle.thisClan)}</b> отбили атаку ${castle.attackInfo.name}`
+      `<b>${await getClanName(castle.thisClan)}</b> отбили атаку ${castle.attackInfo.name}`
 		)
 	}
 
