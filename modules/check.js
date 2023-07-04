@@ -144,7 +144,7 @@ export async function check(bot) {
                 castleState.thisClan.timeAfterAttack = castle.attackInfo.time
                 await constMessage
                   .sendMessage(bot, await constMessage
-                    .notSuccessAttack(castle, castleNameSmiley))
+                    .notSuccessAttack(castle, castleNameSmiley, castleState))
               }
             } else { // Когда нет атаки и ничего не происходит
               castleState.thisClan.timeAfterAttack = castle.attackInfo.time
