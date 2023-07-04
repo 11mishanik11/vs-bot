@@ -26,6 +26,7 @@ class ConstMessage {
 	}
 
 	async notSuccessAttack (castle, nameString, state) {
+		console.log(state)
 		return (
 			`${nameString}\n`+
       `<b>${await getClanName(castle.thisClan)}</b> отбили атаку ${state.attackInfo.name}`
