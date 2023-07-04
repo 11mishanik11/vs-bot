@@ -14,7 +14,7 @@ async function init() {
     setInterval(() => getClansList(), 1800000)
 
     // Проверка
-    await check(bot)
+    check(bot)
     setInterval(() => check(bot), 60000);
   } catch (e) {
     console.error(e);

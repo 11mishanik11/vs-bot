@@ -1,5 +1,6 @@
 import { getPageHtml } from './getPageHtml.js'
 import getClanName from './getClanName.js'
+import constMessage from "../ConstMessage.js";
 
 const smileyCastles = [
   {name: 'Замок Страха', smiley: '😱'},
@@ -7,6 +8,7 @@ const smileyCastles = [
   {name: 'Замок Стали', smiley: '🛡'},
   {name: 'Замок Белого Камня', smiley: '💎'},
 ]
+
 const stateData = {
   castles: [],
 }
@@ -24,7 +26,7 @@ async function thisCastle (castle) {
     let item = {
       name: castle.name,
       smiley: smileyCastles.find(item => item.name === castle.name),
-      timeMessageAttack: null,
+      attackStatus: false,
       thisClan: {
         name: await getClanName(castle.thisClan),
         timeAfterAttack: null,
@@ -94,76 +96,59 @@ export async function check(bot) {
       let castleNameSmiley = `${castleState.smiley.smiley}<b>${castle.name}</b>${castleState.smiley.smiley}`
 
       switch (castle.attackInfo.attack) {
-        case "preAttack":
-          console.log(`Подготовка к атаке: ${castle.attackInfo.time}`)
+        case "preAttack": // Сообщение о начале атаки
+          console.log('Подготовка к атаке: ' + castle.name)
 
           if (castle.attackInfo.time.indexOf('04') !== -1) {
             castleState.attackInfo.startTime = new Date()
             castleState.attackInfo.name = await getClanName(castle.attackInfo.attackClan)
-            bot.telegram.sendMessage(process.env.CHAT_ID,
-              `${castleNameSmiley}\n`+
-              `Текущий клан: ${await getClanName(castle.thisClan)}\n\n`+
-              `Атакующий клан: ${await getClanName(castle.attackInfo.attackClan)}\n`+
-              `⚔️До атаки <b>${castle.attackInfo.time}</b>`,
-              {parse_mode: 'HTML'}
-            )
-          }
-          break
-        case "attack":
-          function sendMessage() {
-            console.log('Штурм начался, отправляю сообщение')
-            castleState.timeMessageAttack = new Date()
-            bot.telegram.sendMessage(process.env.CHAT_ID,
-              `${castleNameSmiley}\n`+
-              `Штурм начался!`,
-              {parse_mode: 'HTML'}
-            )
-          }
+            await constMessage
+              .sendMessage(bot, await constMessage
+                .preAttack(castle, castleNameSmiley))
 
-          if (castleState.timeMessageAttack) {
-            if (new Date() - castleState.timeMessageAttack > 900000) {
-              sendMessage()
-            } else console.log('Штурм все еще идет, крайнее сообщение о штурме было меньше 15 минут назад')
-          } else sendMessage()
+          } else if(castle.attackInfo.time.indexOf('01') !== -1)
+            await constMessage
+              .sendMessage(bot, await constMessage
+                .preAttack(castle, castleNameSmiley))
           break
-        case "noAttack":
-          if (castle.attackInfo.time === '00 ч 00 мин') {
-            console.log('Замок захватили')
+        case "attack": // Действия при атаке
+          if (!castleState.attackStatus) { // Если штурма нет, отправляем сообщение о ее начале
+            console.log('Штурма нет, отправляю сообщение о ее начале: ' + castle.name)
+            castleState.attackStatus = true // Ставим статус активной атаки
+            await constMessage
+              .sendMessage(bot, await constMessage
+                .startAttack(castle, castleNameSmiley))
+          } else console.log('Идет атака: ' + castle.name)
+          break
+        case "noAttack": // Если нет атаки
+          if (castle.attackInfo.time === '00 ч 00 мин') { // Результаты атаки
+            console.log('Замок захватили: ' + castle.name)
 
-            bot.telegram.sendMessage(process.env.CHAT_ID,
-              `${castleNameSmiley}\n`+
-              `<b>${await getClanName(castle.thisClan)}</b> успешно захватили замок!`,
-              {parse_mode: 'HTML'}
-            )
             castleState.thisClan.name = await getClanName(castle.thisClan)
-            castleState.timeMessageAttack = null
+            castleState.attackStatus = false
             castleState.attackInfo.startTime = null
+            await constMessage
+              .sendMessage(bot, await constMessage
+                .successAttack(castle, castleNameSmiley))
           } else {
-            if (castleState.thisClan.timeAfterAttack && castleState.attackInfo.startTime) {
+            if (castleState.thisClan.timeAfterAttack && castleState.attackInfo.startTime) { // Отбили штурм
               let difference = new Date() - castleState.attackInfo.startTime
               let lastTime = timeMs(castleState.thisClan.timeAfterAttack)
               let lastTimeDif = lastTime + difference
               let newTime = timeMs(castle.attackInfo.time)
 
-              console.log('Разница ' + difference)
-              console.log('Старое время + разница = ' + lastTimeDif)
-              console.log(lastTime + '< Старое & Новое >' + newTime)
-
               if (lastTimeDif >= (newTime - 60000) || lastTimeDif <= (newTime + 60000)) {
-                bot.telegram.sendMessage(process.env.CHAT_ID,
-                  `${castleNameSmiley}\n`+
-                  `<b>${await getClanName(castle.thisClan)}</b> отбили штурм ${castleState.attackInfo.name}`,
-                  {parse_mode: 'HTML'}
-                )
-                castleState.timeMessageAttack = null
-                castleState.attackInfo.startTime = null
+                castleState.attackStatus = false
                 castleState.attackInfo.name = null
                 castleState.attackInfo.startTime = null
                 castleState.thisClan.timeAfterAttack = castle.attackInfo.time
+                await constMessage
+                  .sendMessage(bot, await constMessage
+                    .notSuccessAttack(castle, castleNameSmiley))
               }
-            } else {
+            } else { // Когда нет атаки и ничего не происходит
               castleState.thisClan.timeAfterAttack = castle.attackInfo.time
-              console.log('Обновление времени в кеше для: ' + castle.name)
+              console.log('Атаки нет: ' + castle.name)
             }
           }
           break
