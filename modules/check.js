@@ -123,13 +123,13 @@ export async function check(bot) {
         case "noAttack": // Если нет атаки
           if (castle.attackInfo.time === '00 ч 00 мин') { // Результаты атаки
             console.log('Замок захватили: ' + castle.name)
-
-            castleState.thisClan.name = await getClanName(castle.thisClan)
-            castleState.attackStatus = false
-            castleState.attackInfo.startTime = null
             await constMessage
               .sendMessage(bot, await constMessage
                 .successAttack(castle, castleNameSmiley))
+            castleState.thisClan.name = await getClanName(castle.thisClan)
+            castleState.attackStatus = false
+            castleState.attackInfo.startTime = null
+
           } else {
             if (castleState.thisClan.timeAfterAttack && castleState.attackInfo.startTime) { // Отбили штурм
               let difference = new Date() - castleState.attackInfo.startTime
@@ -138,13 +138,14 @@ export async function check(bot) {
               let newTime = timeMs(castle.attackInfo.time)
 
               if (lastTimeDif >= (newTime - 60000) || lastTimeDif <= (newTime + 60000)) {
+                await constMessage
+                  .sendMessage(bot, await constMessage
+                    .notSuccessAttack(castle, castleNameSmiley, castleState))
                 castleState.attackStatus = false
                 castleState.attackInfo.name = null
                 castleState.attackInfo.startTime = null
                 castleState.thisClan.timeAfterAttack = castle.attackInfo.time
-                await constMessage
-                  .sendMessage(bot, await constMessage
-                    .notSuccessAttack(castle, castleNameSmiley, castleState))
+
               }
             } else { // Когда нет атаки и ничего не происходит
               castleState.thisClan.timeAfterAttack = castle.attackInfo.time
